@@ -1,0 +1,16 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: monospace;
+}
+
+h1 {
+    font-size: 100px;
+    text-align: center;
+    text-decoration: solid;
+    text-shadow: 2px;
+}
+
+main {
+    text-align: center;
+}

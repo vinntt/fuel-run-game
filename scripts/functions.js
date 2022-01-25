@@ -8,3 +8,19 @@ function getRandom(min, max) {
 function getHeight(width, originalWidth, originalHeight) {
     return width * originalHeight / originalWidth
 }
+
+function maxBetween(a, b) {
+    if (a > b) {
+        return a;
+    }
+
+    return b;
+}
+
+function minBetween(a, b) {
+    if (a < b) {
+        return a;
+    }
+
+    return b;
+}

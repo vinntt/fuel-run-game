@@ -1,9 +1,11 @@
 class Asteroid extends GameObject {
-    draw() {
-        this.position.x -= 2; // toc do asteroid
+    constructor(position, width, height, img) {
+        super(position, width, height, img);
 
-        super.draw();
+        this.speed = 5;
     }
 
-
+    update() {
+        this.position.x -= this.speed; //the asteroid will move per every frameCount
+    }
 }

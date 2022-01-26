@@ -1,63 +1,59 @@
 class Game {
     constructor(screenWidth, screenHeight) {
-        this.screenWidth = screenWidth;
-        this.screenHeight = screenHeight;
-        this.backgroundImage;
-        this.spaceshipImage;
-        this.asteroidImages = [];
+        this.screen = 'main';
+        this.settings = new Settings(screenWidth, screenHeight);
         this.obstacles = [];
-        this.fuelImage;
+        this.spaceship = null;
+        this.mainScreenButtons = [];
+        // this.mainscreen = new MainScreen(screenWidth, screenHeight);
+
     }
 
     preload() {
-        this.backgroundImage = loadImage('assets/background1.jpg');
-        // this.backgroundImage = [
-        //     { src: loadImage('assets/background-starfield1.png'), x: 0, speed: 0 },
-        //     { src: loadImage('assets/background-starfield2.png'), x: 0, speed: 1 },
-        //     { src: loadImage('assets/background-starfield3.png'), x: 0, speed: 2 },
-        //     { src: loadImage('assets/background-starfield4.png'), x: 0, speed: 3 },
-        //     { src: loadImage('assets/background-starfield5.png'), x: 0, speed: 4 },
-        //     { src: loadImage('assets/background-starfield6.png'), x: 0, speed: 5 },
-        //     { src: loadImage('assets/background-starfield7.png'), x: 0, speed: 6 },
-        //     { src: loadImage('assets/background-starfield8.png'), x: 0, speed: 7 }
-        // ];
-
-        this.spaceshipImage = loadImage('assets/spaceship4.gif');
-        this.asteroidImages = [
-            loadImage('assets/asteroid1.png'),
-            loadImage('assets/asteroid2.png'),
-            loadImage('assets/asteroid3.png'),
-            loadImage('assets/asteroid4.png'),
-            loadImage('assets/asteroid5.png'),
-            loadImage('assets/asteroid6.png')
-        ];
-        this.fuelImage = loadImage('assets/oil2.png');
-
-        this.font = loadFont('assets/font-strong-brain.otf');
+        this.settings.preload();
     }
 
     setup() {
-        const width = this.screenWidth / 10;
+        const buttonX = this.settings.screenWidth / 2 - 170;
+        const buttonY = this.settings.screenHeight / 3;
+
+        this.mainScreenButtons = [
+            new Button(new Position(buttonX, buttonY + 30), 320, 70, 'START', this.settings.fonts[0], () => this.playClicked()),
+            // new Button(new Position(buttonX, buttonY + 130), 320, 70, 'SETTINGS', this.settings.fonts[0]),
+            // new Button(new Position(buttonX, buttonY + 230), 320, 70, 'SOUND ON', this.settings.fonts[0])
+        ];
+        // this.startNewGame();
+        // this.settings.backgroundMusic.play();
+    }
+
+    startNewGame() {
+        const width = this.settings.screenWidth / 10;
 
         this.spaceship = new Spaceship(
-            new Position(this.screenWidth / 4, this.screenHeight / 2),
-            width, getHeight(width, this.spaceshipImage.width, this.spaceshipImage.height),
-            this.spaceshipImage
+            new Position(this.settings.screenWidth / 4, this.settings.screenHeight / 2),
+            width, getHeight(width, this.settings.spaceshipImage.width, this.settings.spaceshipImage.height),
+            this.settings.spaceshipImage
         );
+
+        this.obstacles = [];
     }
+
+    // backMainScreen() {
+    //     this.mainscreen.
+    // }
 
     //used to get the random height of obstacles (asteroids & fuel) on the screen. The objectHeight is different between asteroids & fuel => parameter.
     createRandomPosition(objectHeight) {
         return new Position(
-            this.screenWidth,
-            getRandom(0 + 0.5 * this.spaceship.height, this.screenHeight - objectHeight - 0.5 * this.spaceship.height),
+            this.settings.screenWidth,
+            getRandom(0 + 0.5 * this.spaceship.height, this.settings.screenHeight - objectHeight - 0.5 * this.spaceship.height),
         );
     }
 
     //create a random asteroid per time
     createAsteroid() {
         const width = getRandom(70, 100);
-        const img = this.asteroidImages[getRandom(0, this.asteroidImages.length - 1)]
+        const img = this.settings.asteroidImages[getRandom(0, this.settings.asteroidImages.length - 1)]
         const height = getHeight(width, img.width, img.height);
 
         return new Asteroid(
@@ -69,12 +65,12 @@ class Game {
 
     createFuel() {
         const width = getRandom(70, 100);
-        const height = getHeight(width, this.fuelImage.width, this.fuelImage.height);
+        const height = getHeight(width, this.settings.fuelImage.width, this.settings.fuelImage.height);
 
         return new Fuel(
             this.createRandomPosition(height), // object of class Position
             width, height,
-            this.fuelImage
+            this.settings.fuelImage
         );
     }
 
@@ -85,7 +81,7 @@ class Game {
         }
 
         const lastObstacle = this.obstacles[this.obstacles.length - 1];
-        const minX = this.screenWidth - getRandom(1, 2) * lastObstacle.width;
+        const minX = this.settings.screenWidth - getRandom(1, 2) * lastObstacle.width;
 
         return lastObstacle.position.x < minX;
     }
@@ -106,11 +102,11 @@ class Game {
     }
 
     moveSpaceship(position) {
-        if (position.x > this.screenWidth - this.spaceship.width) {
-            position.x = this.screenWidth - this.spaceship.width;
+        if (position.x > this.settings.screenWidth - this.spaceship.width) {
+            position.x = this.settings.screenWidth - this.spaceship.width;
         }
-        if (position.y > this.screenHeight - this.spaceship.height) {
-            position.y = this.screenHeight - this.spaceship.height;
+        if (position.y > this.settings.screenHeight - this.spaceship.height) {
+            position.y = this.settings.screenHeight - this.spaceship.height;
         }
 
         this.spaceship.moveTo(position);
@@ -132,10 +128,11 @@ class Game {
             if (hit) {
                 //JS function .isPrototypeOf()
                 if (Fuel.prototype.isPrototypeOf(obstacle)) {
+                    this.settings.fuelEffect.play();
                     this.spaceship.increaseFuel(obstacle.fuel);
                 } else {
+                    this.settings.explosionEffect.play();
                     this.spaceship.decreaseLive();
-                    console.log(this.spaceship.lives)
                 }
             }
 
@@ -148,20 +145,41 @@ class Game {
         })
     }
 
+    isMainScreen() {
+        return this.screen === 'main';
+    }
+
+    //to check when the game is ended.
     isEnd() {
         return this.spaceship.fuel === 0 || this.spaceship.lives === 0;
     }
 
+    drawEndScreen() {
+        const textVerticalPosition = this.settings.screenWidth / 4;
+        // console.log(this.settings.screenWidth / 4, this.settings.screenHeight / 2)
+        const textHorizontalPosition = this.settings.screenHeight / 2;
 
-    draw() {
-        if (!this.isEnd()) {
-            this.update();
-        }
+        fill('rgba(255, 255, 255, 0.5)');
+        rect(textVerticalPosition - 10, textHorizontalPosition - textHorizontalPosition / 3, textVerticalPosition * 2, textHorizontalPosition / 2, textVerticalPosition / 6);
 
-        clear();
-        image(this.backgroundImage, 0, 0, this.screenWidth, this.screenHeight);
+        textAlign(LEFT, BASELINE);
+        textFont(this.settings.fonts[1]);
+        textSize(100);
+        strokeWeight(0);
+        fill(40);
+        text('Game Over', textVerticalPosition, textHorizontalPosition);
 
-        textFont(this.font);
+        textFont(this.settings.fonts[2]);
+        textSize(25);
+        strokeWeight(0);
+        fill(255);
+        text('ENTER - Main Screen', textVerticalPosition + 250, textHorizontalPosition + 100) // keycode:13
+        text('SPACEBAR - Restart', textVerticalPosition + 250, textHorizontalPosition + 130) //keycode:32
+    }
+
+    drawBackgroundText() {
+        textAlign(LEFT, BASELINE);
+        textFont(this.settings.fonts[0]);
         textSize(20);
         strokeWeight(0);
         fill(255);
@@ -182,9 +200,91 @@ class Game {
         strokeWeight(0);
         fill(255);
         rect(83, 25, Math.ceil(this.spaceship.fuel / 10) * 20, 16); //20px for every 10% fuel
-
-        this.spaceship.draw();
-        this.obstacles.forEach((obstacle) => obstacle.draw()); //display obstacle by looping everytime
     }
 
+    drawGame() {
+        if (!this.isEnd()) {
+            this.update();
+        }
+
+        noCursor();
+        clear();
+        image(this.settings.backgroundImage, 0, 0, this.settings.screenWidth, this.settings.screenHeight);
+        this.drawBackgroundText();
+        this.spaceship.draw();
+        this.obstacles.forEach((obstacle) => obstacle.draw()); //display obstacle by looping everytime
+
+        if (this.isEnd()) {
+            this.drawEndScreen();
+        }
+    }
+
+    drawMainScreen() {
+        clear();
+        cursor('grab');
+        image(this.settings.backgroundMainScreen, 0, 0, this.settings.screenWidth, this.settings.screenHeight);
+        textFont(this.settings.fonts[1]);
+        textSize(110);
+        strokeWeight(0);
+        fill(255);
+        textAlign(CENTER, CENTER);
+        text('FUEL RUN', 0, 180, this.settings.screenWidth);
+        // text('FUEL RUN', this.settings.screenWidth / 3, this.settings.screenHeight / 3);
+
+        this.mainScreenButtons.forEach((button) => button.draw())
+    }
+
+    draw() {
+        if (this.isMainScreen()) {
+            this.drawMainScreen();
+        } else {
+            this.drawGame();
+        }
+    }
+
+    playClicked() {
+        this.screen = "game";
+        this.startNewGame();
+
+        if (!this.settings.backgroundMusic.isPlaying()) {
+            this.settings.backgroundMusic.loop();
+        }
+    }
+
+    keyPressed() {
+        if (this.isMainScreen()) {
+            return
+        }
+
+        //press spacebar
+        if (this.isEnd() && keyCode === 32) {
+            this.startNewGame();
+        }
+        //press enter
+        else if (this.isEnd() && keyCode === 13) {
+            this.drawMainScreen()
+                // console.log('end')
+                // mainScreen.writeGameName();
+        }
+    }
+
+    mouseMoved() {
+        if (this.isMainScreen()) {
+            return
+        }
+
+        this.moveSpaceship(new Position(maxBetween(mouseX, 0), maxBetween(mouseY, 0)));
+    }
+
+    mouseClicked() {
+        if (!this.isMainScreen()) {
+            return;
+        }
+
+        this.mainScreenButtons.forEach((button) => {
+            if (button.isMouseOver(mouseX, mouseY)) {
+                button.onClicked();
+            }
+        });
+    }
 }

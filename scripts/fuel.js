@@ -3,7 +3,7 @@ class Fuel extends GameObject {
         super(position, width, height, img);
 
         this.fuel = 5; //set value of everyfuel equals to 5
-        this.speed = 5;
+        this.speed = 12;
     }
 
     update() {

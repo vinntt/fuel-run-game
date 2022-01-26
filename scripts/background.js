@@ -1,10 +1,9 @@
 class Background {
     //the background can draw itself - draw function
     draw() {
-        // console.log('this is the background');
         //draw the background with Image objects of the game setting
         //default width and height are variables set by P5 based on the dimensions of the canvas size
-        game.backgroundImage.forEach(function(img) {
+        game.settings.backgroundImage.forEach(function(img) {
             //loop to load the image, later make the image move
             //replace the value to variable img.x
             //x refers from the right to the left, decrease it for moving

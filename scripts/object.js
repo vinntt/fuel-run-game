@@ -3,10 +3,6 @@ class Position {
         this.x = x;
         this.y = y;
     }
-
-    // distance(pos) {
-    //     return dist(this.x, this.y, pos.x, pos.y)
-    // }
 }
 
 class GameObject {
@@ -19,8 +15,6 @@ class GameObject {
     }
 
     draw() {
-        // fill(51);
-        // rect(this.position.x, this.position.y, this.width, this.height);
         image(this.img, this.position.x, this.position.y, this.width, this.height);
     }
 
@@ -35,16 +29,4 @@ class GameObject {
             target.position.x, target.position.y, target.width, target.height
         );
     }
-
-    //hoi lai
-    // center() {
-    //     return new Position(
-    //         this.position.x + this.width / 2,
-    //         this.position.y + this.height / 2,
-    //     )
-    // }
-
-    // collide(target) {
-    //     return this.center().distance(target.center()) < (this.width / 2)
-    // }
 }

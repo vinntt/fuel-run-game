@@ -2,7 +2,7 @@ class Asteroid extends GameObject {
     constructor(position, width, height, img) {
         super(position, width, height, img);
 
-        this.speed = 5;
+        this.speed = 12;
     }
 
     update() {

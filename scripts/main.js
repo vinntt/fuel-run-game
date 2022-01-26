@@ -19,12 +19,14 @@ function draw() {
 }
 
 
-// function keyPressed() {
-//     if (keyCode === 38) {
-//         game.spaceship.jump();
-//     }
-// }
-
 function mouseMoved(event) {
-    game.moveSpaceship(new Position(maxBetween(mouseX, 0), maxBetween(mouseY, 0)));
+    game.mouseMoved();
+}
+
+function keyPressed() {
+    game.keyPressed();
+}
+
+function mouseClicked() {
+    game.mouseClicked();
 }

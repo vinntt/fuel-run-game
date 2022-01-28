@@ -5,12 +5,12 @@ class Game {
         this.obstacles = [];
         this.spaceship = null;
         this.mainScreenButtons = [];
-        // this.mainscreen = new MainScreen(screenWidth, screenHeight);
-
+        // this.second = 0.001;
     }
 
     preload() {
         this.settings.preload();
+        this.background = new Background(this.settings.backgroundImages, this.settings.screenWidth, this.settings.screenHeight)
     }
 
     setup() {
@@ -19,11 +19,9 @@ class Game {
 
         this.mainScreenButtons = [
             new Button(new Position(buttonX, buttonY + 30), 320, 70, 'START', this.settings.fonts[0], () => this.playClicked()),
-            // new Button(new Position(buttonX, buttonY + 130), 320, 70, 'SETTINGS', this.settings.fonts[0]),
+            // new Button(new Position(buttonX, buttonY + 130), 320, 70, 'SETTINGS', this.settings.fonts[0], () => playSoundOff()),
             // new Button(new Position(buttonX, buttonY + 230), 320, 70, 'SOUND ON', this.settings.fonts[0])
         ];
-        // this.startNewGame();
-        // this.settings.backgroundMusic.play();
     }
 
     startNewGame() {
@@ -38,10 +36,6 @@ class Game {
         this.obstacles = [];
     }
 
-    // backMainScreen() {
-    //     this.mainscreen.
-    // }
-
     //used to get the random height of obstacles (asteroids & fuel) on the screen. The objectHeight is different between asteroids & fuel => parameter.
     createRandomPosition(objectHeight) {
         return new Position(
@@ -52,7 +46,7 @@ class Game {
 
     //create a random asteroid per time
     createAsteroid() {
-        const width = getRandom(70, 100);
+        const width = getRandom(100, 200);
         const img = this.settings.asteroidImages[getRandom(0, this.settings.asteroidImages.length - 1)]
         const height = getHeight(width, img.width, img.height);
 
@@ -64,7 +58,7 @@ class Game {
     }
 
     createFuel() {
-        const width = getRandom(70, 100);
+        const width = getRandom(80, 120);
         const height = getHeight(width, this.settings.fuelImage.width, this.settings.fuelImage.height);
 
         return new Fuel(
@@ -76,12 +70,12 @@ class Game {
 
     //create obstacles
     shouldSpawnNewObstacle() {
-        if (this.obstacles.length === 0) { //empty obstacle
+        if (this.obstacles.length === 0) {
             return true;
         }
 
         const lastObstacle = this.obstacles[this.obstacles.length - 1];
-        const minX = this.settings.screenWidth - getRandom(1, 2) * lastObstacle.width;
+        const minX = this.settings.screenWidth - getRandom(1, 1.5) * lastObstacle.width;
 
         return lastObstacle.position.x < minX;
     }
@@ -115,7 +109,6 @@ class Game {
     update() {
         this.spaceship.update()
         this.obstacles.forEach((obstacle) => obstacle.update());
-
         //display obstacles per 60 frames
         if (frameCount % 60 === 0) {
             this.createObstable();
@@ -156,7 +149,6 @@ class Game {
 
     drawEndScreen() {
         const textVerticalPosition = this.settings.screenWidth / 4;
-        // console.log(this.settings.screenWidth / 4, this.settings.screenHeight / 2)
         const textHorizontalPosition = this.settings.screenHeight / 2;
 
         fill('rgba(255, 255, 255, 0.5)');
@@ -185,6 +177,7 @@ class Game {
         fill(255);
         text('Fuel', 20, 40);
         text('Live', 20, 70);
+        // text('TIME:' + Math.floor(this.second * millis()), 20, 110);
         textFont('sans-serif');
 
         const lives = minBetween(this.spaceship.lives, 3);
@@ -207,9 +200,10 @@ class Game {
             this.update();
         }
 
-        noCursor();
+        noCursor(); //hide the mouse pointer
         clear();
-        image(this.settings.backgroundImage, 0, 0, this.settings.screenWidth, this.settings.screenHeight);
+        // image(this.settings.backgroundImage, 0, 0, this.settings.screenWidth, this.settings.screenHeight);
+        this.background.draw();
         this.drawBackgroundText();
         this.spaceship.draw();
         this.obstacles.forEach((obstacle) => obstacle.draw()); //display obstacle by looping everytime
@@ -256,15 +250,12 @@ class Game {
             return
         }
 
-        //press spacebar
         if (this.isEnd() && keyCode === 32) {
             this.startNewGame();
-        }
-        //press enter
-        else if (this.isEnd() && keyCode === 13) {
-            this.drawMainScreen()
-                // console.log('end')
-                // mainScreen.writeGameName();
+
+        } else if (this.isEnd() && keyCode === 13) {
+            this.screen = 'main';
+            this.draw()
         }
     }
 

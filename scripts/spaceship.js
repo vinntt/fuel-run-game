@@ -4,7 +4,7 @@ class Spaceship extends GameObject {
 
         this.fuel = 100; //the default fuel for spaceship at the beginning
         this.lives = 3; //the given lives for spaceship
-        this.speed = 7;
+        this.speed = 9;
         this.destination = position;
     }
 
